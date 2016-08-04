@@ -14,15 +14,21 @@ Extensions for LSA format has also been proposed to support SID/Label Binding, E
   - This project does not deal with the LSA extension. 
   - The dissection is focused on Routing Information Opaque LSA TLV formats
 
-## TLVs to be Dissected
+## TLVs under consideration 
+
+> SR-Algorithm TLV
+
+<img src="images/sr_algorithm.png" align="center">
+<br> 
+
+> SID/Label Range TLV
+
+<img src="images/sid_range.png" align="center">
+<br>
 
 > SID/Label Sub TLV
 
-<h1 align="center">
-  <br>
-  <img src="images/sid_label.png" align="center">
-  <br>
-  <br>
-</h1>
+<img src="images/sid_label.png" align="center">
+<br>
 
 
