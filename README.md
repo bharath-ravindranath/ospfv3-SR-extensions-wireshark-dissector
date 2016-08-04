@@ -15,3 +15,14 @@ Extensions for LSA format has also been proposed to support SID/Label Binding, E
   - The dissection is focused on Routing Information Opaque LSA TLV formats
 
 ## TLVs to be Dissected
+
+> SID/Label Sub TLV
+
+<h1 align="center">
+  <br>
+  <img src="images/sid_label.png" align="center">
+  <br>
+  <br>
+</h1>
+
+
