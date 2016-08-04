@@ -15,29 +15,3 @@ Extensions for LSA format has also been proposed to support SID/Label Binding, E
   - The dissection is focused on Routing Information Opaque LSA TLV formats
 
 ## TLVs to be Dissected
-
-
-0                   1                   2                   3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|              Type             |             Length           |
--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|   Algorithm 1 | Algorithm...  |   Algorithm n |              |
--                                                             -+
-|                                                              |
-+                                                              +
-
-
-> SID/Label Range TLV
-
-    0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Type             |             Length            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    Range Size                 |   Reserved    |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        Sub-TLVs (variable)                    |
-   +-                                                             -+
-   |                                                               |
-   +                                                               +
