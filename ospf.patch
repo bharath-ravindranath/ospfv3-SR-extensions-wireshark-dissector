@@ -1,0 +1,97 @@
+--- packet-ospf.c	2016-08-09 19:44:33.862354570 -0400
++++ packet-ospf-changed.c	2016-08-09 19:43:28.230355307 -0400
+@@ -248,6 +248,9 @@
+ #define OPT_RI_TLV       1
+ #define DYN_HOSTNAME_TLV 7
+ 
++/* Segment Routing Capabilities in Routing Information LSA for OSPFv3: TLV Types*/
++#define SR_ALGORITHM_TLV 8
++
+ #if 0
+ /* The Opaque RI LSA TLV types definitions. */
+ static const value_string ri_tlv_type_vals[] = {
+@@ -257,6 +260,15 @@
+ };
+ #endif
+ 
++#define SR_ALGORITHM_TLV_SPF    0
++#define SR_ALGORITHM_TLV_SSPF   1
++
++static const value_string sr_algorithm_tlv_type_vals[] = {
++    {SR_ALGORITHM_TLV_SPF,      "Shortest Path First (SPF)"         },
++    {SR_ALGORITHM_TLV_SSPF,     "Strict Shortest Path First (SPF)"  },
++    {-1,                        NULL                                }
++};
++
+ static const value_string ls_type_vals[] = {
+     {OSPF_LSTYPE_ROUTER,                  "Router-LSA"                   },
+     {OSPF_LSTYPE_NETWORK,                 "Network-LSA"                  },
+@@ -408,6 +420,7 @@
+ static gint ett_ospf_lsa_opaque_ri = -1;
+ static gint ett_ospf_lsa_ri_tlv = -1;
+ static gint ett_ospf_lsa_dyn_hostname_tlv = -1;
++static gint ett_ospf_lsa_sr_algorithm_tlv = -1;
+ static gint ett_ospf_lsa_unknown_tlv = -1;
+ 
+ 
+@@ -586,6 +599,7 @@
+ static int hf_ospf_v3_prefix_option_p = -1;
+ static int hf_ospf_dyn_hostname = -1;
+ static int hf_ospf_unknown_tlv_txt = -1;
++static int hf_ospf_sr_algorithm = -1;
+ static int hf_ospf_v2_grace_tlv = -1;
+ static int hf_ospf_v2_grace_period = -1;
+ static int hf_ospf_v2_grace_reason = -1;
+@@ -2341,6 +2355,9 @@
+ 
+     int tlv_type;
+     int tlv_length;
++    guint16 sr_algorithm_number;
++    guint8 sr_algorithm_number_value;
++    const char *sr_algorithm_name;
+ 
+     ri_tree = proto_tree_add_subtree(tree, tvb, offset, length,
+                              ett_ospf_lsa_opaque_ri, NULL, "Opaque Router Information LSA");
+@@ -2375,6 +2392,25 @@
+            proto_tree_add_item(tlv_tree, hf_ospf_dyn_hostname, tvb, offset+4, tlv_length, ENC_ASCII|ENC_NA);
+            break;
+ 
++        case SR_ALGORITHM_TLV:
++           tlv_tree = proto_tree_add_subtree(ri_tree, tvb, offset, tlv_length+4,
++                                    ett_ospf_lsa_sr_algorithm_tlv, NULL, "SR-Algorithm TLV");
++           
++           proto_tree_add_uint_format_value(tlv_tree, hf_ospf_tlv_length, tvb, offset, 2, tlv_type, "SR-Algorithm TLV (%u)", tlv_type);
++
++           if (tlv_length > 0){
++               sr_algorithm_number = 1;
++               while(sr_algorithm_number <= tlv_length) {
++                   sr_algorithm_number_value = tvb_get_guint8(tvb, offset + sr_algorithm_number + 3);
++                   sr_algorithm_name = val_to_str_const(sr_algorithm_number_value, sr_algorithm_tlv_type_vals, "Unknown SR-Algorithm");
++                   proto_tree_add_uint_format_value(tlv_tree, hf_ospf_sr_algorithm, tvb, offset + sr_algorithm_number + 3, 1, sr_algorithm_number_value,
++                                         "Algorithm %d: (%d) %s", sr_algorithm_number, sr_algorithm_number_value, sr_algorithm_name);
++                   /*proto_tree_add_item(tlv_tree, hf_ospf_sr_algorithm, tvb, offset + sr_algorithm_number + 3, 1, ENC_BIG_ENDIAN);*/
++                   sr_algorithm_number ++;
++               }
++           }
++           break;
++
+         default:
+            tlv_tree = proto_tree_add_subtree(ri_tree, tvb, offset, tlv_length+4,
+                                     ett_ospf_lsa_unknown_tlv, NULL, "Unknown Opaque RI LSA TLV");
+@@ -3610,6 +3646,8 @@
+         {&hf_ospf_unknown_tlv_txt,
+          { "Text in the Unknown TLV", "ospf.unknown_text", FT_STRING, BASE_NONE, NULL, 0x0, NULL, HFILL }},
+ 
++        {&hf_ospf_sr_algorithm,
++         {"SR-Algorithm","ospf.sralgorithm", FT_UINT8, BASE_DEC, NULL, 0x0, NULL, HFILL}},
+         /* OSPF Restart TLVs  */
+         {&hf_ospf_v2_grace_tlv,
+          { "Grace TLV", "ospf.v2.grace", FT_NONE, BASE_NONE, NULL, 0x0, NULL, HFILL}},
+@@ -3767,6 +3805,7 @@
+         &ett_ospf_lsa_opaque_ri,
+         &ett_ospf_lsa_ri_tlv,
+         &ett_ospf_lsa_dyn_hostname_tlv,
++        &ett_ospf_lsa_sr_algorithm_tlv,
+         &ett_ospf_lsa_unknown_tlv,
+         &ett_ospf_lsa_oif_tna,
+         &ett_ospf_lsa_oif_tna_stlv,
